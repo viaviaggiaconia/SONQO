@@ -1,8 +1,8 @@
 {
   "name": "SONQO",
   "short_name": "SONQO",
-  "start_url": "./index.html?source=pwa",
-  "scope": "./",
+  "start_url": "./SONQO-PWA.html?source=pwa",
+  "scope": "./"
   "display": "standalone",
   "background_color": "#0a0e1e",
   "theme_color": "#5aa9d6",
@@ -13,3 +13,4 @@
     { "src": "icons/sonqo-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
+
