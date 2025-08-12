@@ -235,7 +235,7 @@ input::placeholder{color:rgba(31,42,52,.55)}
 <div id="infoPanel" class="panel" role="dialog" aria-label="Informazioni">
   <h4>Informazioni & Privacy</h4>
   <div class="small-note">
-    I pensieri che inserisci restano <b>privati</b> e memorizzati solo sul tuo dispositivo. Puoi esportarli e importarli quando vuoi.
+    I pensieri che inserisci restano <b>privati</b> e memorizzati solo sul tuo dispositivo. 
   </div>
   <div class="small-note">
     <b>Disclaimer:</b> SONQO è uno strumento di intrattenimento e benessere personale. Non sostituisce in alcun modo il parere di medici o professionisti della salute.
@@ -349,16 +349,7 @@ input::placeholder{color:rgba(31,42,52,.55)}
           <div class="whiteText small">…oppure aggiungi un nuovo pensiero</div>
           <div class="inlineAdd">
             <input id="inlineInput" placeholder="Scrivi un pensiero positivo..."/>
-            <button class="btn ghost" id="saveInline" style="width:auto;white-space:nowrap;padding:0 8px">Salva</button>
-          
-          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px">
-            <button class="btn ghost" id="exportBtn" style="width:auto;padding:0 8px">Esporta pensieri</button>
-            <input type="file" id="importFile" accept="application/json" style="display:none">
-            <button class="btn ghost" id="importBtn" style="width:auto;padding:0 8px">Importa pensieri</button>
-          </div>
-          <div class="whiteText small" style="opacity:.9;margin-top:6px">I tuoi dati sono tuoi: puoi portarli con te.</div>
-
-        </div>
+            <button class="btn ghost" id="saveInline" style="width:auto;white-space:nowrap;padding:0 8px">Salva</button></div>
       </div>
       <div class="bottom" style="display:flex;justify-content:center;gap:10px">
         <button class="btn ghost" id="logoutBtn" style="max-width:180px">Esci</button>
@@ -1207,62 +1198,7 @@ if ('serviceWorker' in navigator) {
   }
 })();
 
-/* ===== Import / Export ===== */
-(function(){
-  const exportBtn = document.getElementById('exportBtn');
-  const importBtn = document.getElementById('importBtn');
-  const importFile = document.getElementById('importFile');
-
-  function download(filename, text) {
-    const blob = new Blob([text], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = filename;
-    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-  }
-
-  if(exportBtn){
-    exportBtn.addEventListener('click', ()=>{
-      try{
-        if(!window.currentUser){ alert('Accedi per esportare i tuoi pensieri.'); return; }
-        const users = JSON.parse(localStorage.getItem('sonqoUsers') || '{}');
-        const u = users[window.currentUser.email];
-        const payload = {
-          app: 'SONQO', version: 1,
-          exportedAt: new Date().toISOString(),
-          user: { name: u?.name || window.currentUser.name || '', email: window.currentUser.email },
-          phrases: (u?.phrases || window.currentUser?.phrases || []).map(p => ({ text: p }))
-        };
-        download(`sonqo-${window.currentUser.email.replace(/[^a-z0-9]/gi,'_')}.json`, JSON.stringify(payload, null, 2));
-      }catch(e){ console.error(e); alert('Esportazione non riuscita.'); }
-    });
-  }
-
-  if(importBtn && importFile){
-    importBtn.addEventListener('click', ()=> importFile.click());
-    importFile.addEventListener('change', async ()=>{
-      const f = importFile.files[0]; if(!f) return;
-      try{
-        const txt = await f.text();
-        const data = JSON.parse(txt);
-        if(!window.currentUser){ alert('Accedi prima di importare.'); return; }
-        const users = JSON.parse(localStorage.getItem('sonqoUsers') || '{}');
-        const u = users[window.currentUser.email] || { name: window.currentUser.name, password: '', phrases: [] };
-        const existing = new Set((u.phrases||[]));
-        const incoming = (data.phrases||[]).map(x=>x.text).filter(Boolean);
-        let added = 0;
-        for(const p of incoming){ if(!existing.has(p)){ u.phrases.push(p); existing.add(p); added++; } }
-        users[window.currentUser.email] = u;
-        localStorage.setItem('sonqoUsers', JSON.stringify(users));
-        if(window.currentUser){ window.currentUser.phrases = u.phrases; }
-        if(typeof updateCount==='function') updateCount();
-        if(typeof paintStars==='function') paintStars();
-        const bubble = document.getElementById('bubble'); if(bubble) bubble.textContent = `Importati ${added} pensieri ✨`;
-      }catch(e){ console.error(e); alert('Import non riuscito. Assicurati di selezionare un file esportato da SONQO.'); }
-      finally{ importFile.value=''; }
-    });
-  }
-})();
-
 </script>
 </body>
 </html>
+
