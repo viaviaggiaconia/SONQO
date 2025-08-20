@@ -27,52 +27,68 @@ const THEMES = [
 let currentThemeIndex = 0;
 let currentTheme = THEMES[currentThemeIndex].key;
 
+/* ==================== Background manifest ==================== */
+/** Verrà caricato da ./backgrounds.json. Valori: array di estensioni in ordine di preferenza */
+let BG_MANIFEST = {
+  oceano:   ['webp'],
+  bosco:    ['webp'],
+  montagna: ['webp'],
+  deserto:  ['webp'],
+  citta:    ['webp'],
+};
+
+async function loadBGManifest(){
+  try{
+    const res = await fetch('./backgrounds.json', { cache:'no-store' });
+    if (res.ok) BG_MANIFEST = await res.json();
+  }catch(_){}
+}
+
 /* ==================== Background Manager ==================== */
 class BackgroundManager {
-  // Preferenza: AI video -> AI img -> asset locali
-  // Locali attesi: /backgrounds/<tema>.webm|.mp4|.avif|.webp|.jpg|.png
   constructor(rootEl){ this.root = rootEl; this.currentEl = null; }
 
   async setTheme(theme){
     const media = await this.resolveBestSource(theme);
-    await this.crossfadeTo(media);
-    // accento UI
+    await this.crossfadeTo(media, theme);
     const t = THEMES.find(t=>t.key===theme) || THEMES[0];
     document.documentElement.style.setProperty('--accent', t.accent);
   }
 
   async resolveBestSource(theme){
-    // Hook futuri per IA (ritornano null per ora):
+    // Hook futuri IA (ritornano null per ora)
     const aiVid = await this.tryAIVideo(theme); if (aiVid) return aiVid;
     const aiImg = await this.tryAIImage(theme); if (aiImg) return aiImg;
 
-    // Fallback locale
+    // Usa solo estensioni dichiarate nel manifest (stop ai 404)
+    const exts = BG_MANIFEST[theme] || ['webp'];
+    const mapType = ext => (ext === 'webm' || ext === 'mp4') ? 'video' : 'image';
     const base = `./backgrounds/${theme}`;
-    const candidates = [
-      { type:'video', url:`${base}.webm` },
-      { type:'video', url:`${base}.mp4`  },
-      { type:'image', url:`${base}.avif` },
-      { type:'image', url:`${base}.webp` },
-      { type:'image', url:`${base}.jpg`  },
-      { type:'image', url:`${base}.png`  },
-    ];
-    for (const c of candidates) {
-      if (await this.headExists(c.url)) return c;
+
+    for (const ext of exts) {
+      const url = `${base}.${ext}`;
+      return { type: mapType(ext), url }; // scegli il primo dichiarato
     }
-    // Ultimo fallback: gradiente
+
+    // Fallback finale (gradiente)
     return { type:'image', url:this.makeFallbackDataURL(theme) };
   }
 
-  async headExists(url){
-    try{ const r = await fetch(url, { method:'HEAD', cache:'no-store' }); return r.ok; }
-    catch{ return false; }
-  }
+  async crossfadeTo(media, theme){
+    let el = (media.type === 'video') ? this.makeVideo(media.url) : this.makeImg(media.url);
+    const ok = await this.waitLoad(el, media.type);
+    if (!ok){
+      // Fallback immediato a gradiente se il file manca
+      el.remove();
+      const fb = { type:'image', url:this.makeFallbackDataURL(theme) };
+      el = (fb.type === 'video') ? this.makeVideo(fb.url) : this.makeImg(fb.url);
+      await this.waitLoad(el, fb.type);
+    }
 
-  async crossfadeTo(media){
-    const el = media.type === 'video' ? this.makeVideo(media.url) : this.makeImg(media.url);
     el.style.opacity = '0';
     this.root.appendChild(el);
     requestAnimationFrame(()=>{ el.classList.add('active'); });
+
     const prev = this.currentEl;
     if (prev){
       prev.classList.remove('active');
@@ -81,29 +97,41 @@ class BackgroundManager {
     this.currentEl = el;
   }
 
+  waitLoad(el, type){
+    return new Promise(resolve=>{
+      const onOK = ()=>resolve(true);
+      const onErr = ()=>resolve(false);
+      if (type === 'video'){
+        el.addEventListener('loadeddata', onOK, { once:true });
+        el.addEventListener('error', onErr, { once:true });
+      } else {
+        el.addEventListener('load', onOK, { once:true });
+        el.addEventListener('error', onErr, { once:true });
+      }
+    });
+  }
+
   makeVideo(url){
     const v = document.createElement('video');
     v.src = url; v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
     v.setAttribute('preload','metadata');
-    v.addEventListener('error',()=>console.warn('Video background failed',url));
     return v;
   }
   makeImg(url){
     const i = document.createElement('img');
     i.src = url; i.alt = ''; i.decoding = 'async'; i.loading = 'eager';
-    i.addEventListener('error',()=>console.warn('Image background failed',url));
     return i;
   }
 
-  async tryAIVideo(){ return null; } // integrare in Phase 2
-  async tryAIImage(){ return null; }  // integrare in Phase 2
+  async tryAIVideo(){ return null; } // Phase 2
+  async tryAIImage(){ return null; }  // Phase 2
 
   makeFallbackDataURL(theme){
     const map = {
-      oceano:['#0a0e1e','#1b4b6c','#2b80a8'],
-      bosco:['#0b1a14','#0e3c2a','#176d46'],
+      oceano:['#06121d','#0f3a59','#2b80a8'],
+      bosco:['#07140f','#0e3c2a','#1e6a46'],
       montagna:['#0a0e1e','#2a3b5f','#9fb8ff'],
-      deserto:['#20160a','#6b4b20','#f8c27a'],
+      deserto:['#1d1208','#6b4b20','#f8c27a'],
       citta:['#081018','#143047','#3a6e8d']
     };
     const [a,b,c] = map[theme] || ['#0a0e1e','#1b1b1b','#444'];
@@ -124,14 +152,14 @@ class BackgroundManager {
 }
 const bg = new BackgroundManager(els.bgRoot);
 
-/* ==================== Vase Engine (particelle “stelline”) ==================== */
+/* ==================== Vase Engine (bokeh morbido) ==================== */
 class VaseEngine {
   constructor(canvas){
     this.c = canvas;
     this.ctx = canvas.getContext('2d');
     this.running = false;
     this.particles = [];
-    this.maxParticles = 300;
+    this.maxParticles = 360;
     this.target = 0;
     this.lastT = 0;
     this.accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
@@ -141,9 +169,7 @@ class VaseEngine {
     this.loop = this.loop.bind(this);
   }
   setAccent(hex){ this.accent = hex; }
-  setTargetCount(n){
-    this.target = Math.min(this.maxParticles, n);
-  }
+  setTargetCount(n){ this.target = Math.min(this.maxParticles, n); }
   resize(){
     const r = els.vaseWrap.getBoundingClientRect();
     const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
@@ -152,12 +178,12 @@ class VaseEngine {
     this.c.style.width = r.width + 'px';
     this.c.style.height = r.height + 'px';
     this.ctx.setTransform(dpr,0,0,dpr,0,0);
-    // path dell’area del vaso (in CSS px)
+
     this.area = new Path2D();
     const w = r.width, h = r.height;
-    const neckW = w * 0.45, bodyW = w * 0.8;
+    const neckW = w * 0.45, bodyW = w * 0.82;
     const topY = h * 0.08, neckY = h * 0.18;
-    const bellyY = h * 0.65, bottomY = h * 0.90;
+    const bellyY = h * 0.66, bottomY = h * 0.90;
     this.area.moveTo((w-neckW)/2, topY);
     this.area.lineTo((w+neckW)/2, topY);
     this.area.bezierCurveTo(w*0.92, neckY,  w*0.88, bellyY,  (w+bodyW)/2, bellyY);
@@ -169,14 +195,14 @@ class VaseEngine {
     for(let i=0;i<n;i++){
       if(this.particles.length>=this.maxParticles) return;
       const p = this.randomPointInArea();
-      const s = 1 + Math.random()*2.2;
+      const s = 1.2 + Math.random()*2.4;
       const hue = this.hexToHsl(this.accent).h;
       this.particles.push({
         x:p.x, y:p.y,
-        vx: (Math.random()-0.5)*0.35,
-        vy: -0.25 - Math.random()*0.35,
+        vx: (Math.random()-0.5)*0.25,
+        vy: -0.18 - Math.random()*0.28,
         r: s,
-        a: 0.55 + Math.random()*0.45,
+        a: 0.55 + Math.random()*0.35,
         tw: Math.random()*Math.PI*2,
         hue
       });
@@ -184,12 +210,12 @@ class VaseEngine {
   }
   randomPointInArea(){
     const r = this.c.getBoundingClientRect();
-    for(let k=0;k<1000;k++){
+    for(let k=0;k<300;k++){
       const x = Math.random()*r.width;
       const y = Math.random()*r.height;
       if (this.ctx.isPointInPath(this.area, x, y)) return {x,y};
     }
-    return {x:r.width/2, y:r.height*0.8};
+    return {x:r.width*0.5, y:r.height*0.8};
   }
   hexToHsl(hex){
     const c = hex.replace('#','');
@@ -213,14 +239,14 @@ class VaseEngine {
   }
   update(dt){
     const need = this.target - this.particles.length;
-    if (need>0) this.spawn(Math.min(6, need));
+    if (need>0) this.spawn(Math.min(8, need));
     if (need<0) this.particles.splice(this.target);
 
     for(const p of this.particles){
-      p.tw += dt*0.006;
-      p.x += p.vx;
+      p.tw += dt*0.0045;
+      p.x += p.vx + 0.04*Math.sin(p.tw*0.8);
       p.y += p.vy;
-      p.vy += 0.002; // gravità lieve
+      p.vy += 0.0015;
       if (!this.ctx.isPointInPath(this.area, p.x, p.y)){
         p.vx *= -0.9; p.vy *= -0.7;
       }
@@ -234,20 +260,22 @@ class VaseEngine {
 
     ctx.save(); ctx.clip(this.area);
 
-    const g = ctx.createRadialGradient(w*0.5,h*0.85, 10, w*0.5,h*0.75, Math.max(w,h)*0.7);
-    g.addColorStop(0,'rgba(255,255,255,0.06)');
+    // bagliore
+    const g = ctx.createRadialGradient(w*0.5,h*0.82, 8, w*0.5,h*0.7, Math.max(w,h)*0.75);
+    g.addColorStop(0,'rgba(255,255,255,0.07)');
     g.addColorStop(1,'rgba(255,255,255,0.0)');
     ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
 
+    // bokeh
     for(const p of this.particles){
-      const size = p.r * (1 + 0.28*Math.sin(p.tw));
-      const grd = ctx.createRadialGradient(p.x,p.y,0.1, p.x,p.y,size*3);
+      const size = p.r * (1 + 0.22*Math.sin(p.tw));
+      const grd = ctx.createRadialGradient(p.x,p.y,0.1, p.x,p.y,size*3.2);
       const hue = p.hue;
-      grd.addColorStop(0, `hsla(${hue} 90% 80% / ${0.95*p.a})`);
-      grd.addColorStop(0.6, `hsla(${hue} 95% 65% / ${0.35*p.a})`);
+      grd.addColorStop(0, `hsla(${hue} 95% 86% / ${0.95*p.a})`);
+      grd.addColorStop(0.55, `hsla(${hue} 95% 68% / ${0.35*p.a})`);
       grd.addColorStop(1, `rgba(255,255,255,0)`);
       ctx.fillStyle = grd;
-      ctx.beginPath(); ctx.arc(p.x, p.y, size*3, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x, p.y, size*3.2, 0, Math.PI*2); ctx.fill();
     }
     ctx.restore();
   }
@@ -269,11 +297,13 @@ const DB_NAME = 'sonqo-db';
 const STORE_THOUGHTS = 'thoughts';
 let db;
 
-openDB().then(async ()=>{
+(async function boot(){
+  await loadBGManifest();               // <— carica manifest sfondi
+  await openDB();
   await bg.setTheme(currentTheme);
   vase.setActive(true);
   await refreshCount();
-}).catch(console.error);
+})().catch(console.error);
 
 function openDB(){
   return new Promise((resolve, reject)=>{
@@ -328,7 +358,7 @@ async function onSave(){
   await addThought(t, currentTheme);
   els.thoughtInput.value = '';
   await refreshCount();
-  vase.spawn(8); // feedback immediato
+  vase.spawn(10);
 }
 
 els.themeBtn.addEventListener('click', async ()=>{
