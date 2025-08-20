@@ -1,0 +1,19 @@
+{
+  "name": "SONQO",
+  "short_name": "SONQO",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a0e1e",
+  "theme_color": "#5aa9d6",
+  "icons": [
+    { "src": "icons/sonqo-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/sonqo-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/sonqo-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "icons/sonqo-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
+
+
+
+
