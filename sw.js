@@ -1,10 +1,12 @@
 /* SONQO — Service Worker minimal */
-const CACHE = 'sonqo-v3';
+const CACHE = 'sonqo-v4'; // <— bump
 const APP_SHELL = [
   './',
   './index.html',
   './app.js',
+  './styles.css',
   './manifest.webmanifest',
+  './backgrounds.json',
   './icons/sonqo-180.png',
   './icons/sonqo-192.png',
   './icons/sonqo-512.png',
@@ -27,20 +29,17 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
 
-  // Navigazioni: offline fallback su index.html
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).catch(()=>caches.match('./index.html')));
     return;
   }
 
   const url = new URL(req.url);
-  // App shell: cache-first
   if (APP_SHELL.some(p => url.pathname.endsWith(p.replace('./','/')) || (p==='./' && url.pathname.endsWith('/')))) {
     e.respondWith(caches.match(req).then(r => r || fetch(req)));
     return;
   }
 
-  // Media (immagini/video): stale-while-revalidate
   const isMedia = req.destination === 'image' || req.destination === 'video';
   if (isMedia) {
     e.respondWith((async ()=>{
@@ -52,6 +51,7 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Default: network -> fallback cache
   e.respondWith(fetch(req).catch(()=>caches.match(req)));
 });
+
+
