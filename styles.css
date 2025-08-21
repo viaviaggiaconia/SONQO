@@ -521,3 +521,36 @@ input::placeholder{color:rgba(31,42,52,.55)}
     animation: none !important;
   }
 }
+
+
+/* ===== Mobile tweaks (readability & spacing) ===== */
+@media (max-width: 600px){
+
+  /* 1) Panels: legible light(ish) background */
+  #ctrlPanel.panel, #infoPanel.panel{
+    background: rgba(15, 22, 35, .90);
+    border-color: rgba(255,255,255,.14);
+    box-shadow: 0 10px 32px rgba(0,0,0,.45);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+
+  /* 2) Jar screen: push brand/meta/instruction & phrase down */
+  #jar .headerBar{
+    margin-top: calc(env(safe-area-inset-top) + 56px);
+  }
+  #jar .phraseBubble{
+    margin-top: 8px;
+  }
+
+  /* 3) Theme selection: move pager, confirm button, and theme name lower */
+  :root{
+    --pager-bottom: clamp(34px, 12vh, 110px);
+  }
+  .captionText{
+    bottom: calc(env(safe-area-inset-bottom) + 14px);
+  }
+  #confirmTheme{
+    margin-bottom: calc(env(safe-area-inset-bottom) + 12px);
+  }
+}
