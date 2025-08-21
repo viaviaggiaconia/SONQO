@@ -615,3 +615,44 @@ input::placeholder{color:rgba(31,42,52,.55)}
     margin-bottom: calc(env(safe-area-inset-bottom) + (var(--toggle) * 1.6)) !important;
   }
 }
+
+
+/* ===== Mobile: controls docked at bottom + panels above ===== */
+@media (max-width: 600px){
+  /* buttons to bottom-right */
+  .control-toggle{
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom) + 12px);
+  }
+  .control-toggle.gear{
+    right: calc(12px + var(--toggle) + 10px);
+  }
+  .control-toggle.info{
+    right: calc(12px + (var(--toggle) + 10px) * 2);
+  }
+
+  /* panels appear above the buttons */
+  #ctrlPanel.panel, #infoPanel.panel{
+    top: auto;
+    left: auto;
+    right: 12px;
+    bottom: calc(env(safe-area-inset-bottom) + var(--toggle) + 20px);
+    min-width: min(92vw, 360px);
+    background: var(--panel-bg, rgba(18,32,51,.66));
+    border-color: var(--panel-brd, rgba(255,255,255,.28));
+    box-shadow: 0 14px 32px rgba(0,0,0,.45);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+
+  /* theme screen elements higher than the control dock */
+  #theme .pager{
+    bottom: calc(env(safe-area-inset-bottom) + (var(--toggle) * 1.6)) !important;
+  }
+  #theme .hint{
+    bottom: calc(env(safe-area-inset-bottom) + (var(--toggle) * 2.2)) !important;
+  }
+  #confirmTheme{
+    margin-bottom: calc(env(safe-area-inset-bottom) + (var(--toggle) * 1.6)) !important;
+  }
+}
