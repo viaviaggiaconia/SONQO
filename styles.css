@@ -554,3 +554,30 @@ input::placeholder{color:rgba(31,42,52,.55)}
     margin-bottom: calc(env(safe-area-inset-bottom) + 12px);
   }
 }
+
+
+/* ===== Mobile layout fixes (overlap + theme spacing) ===== */
+@media (max-width: 600px){
+
+  /* 2) Jar screen: push down header (SONQO + meta + istruzione) far enough to clear control icons */
+  #jar .headerBar{
+    margin-top: calc(env(safe-area-inset-top) + (var(--toggle) * 2) + 12px);
+  }
+  #jar .phraseBubble{
+    margin-top: 12px;
+  }
+
+  /* 3) Theme selection: place elements LOWER near bottom */
+  #theme .pager{
+    bottom: calc(env(safe-area-inset-bottom) + 24px) !important;
+  }
+  #theme .hint{
+    bottom: calc(env(safe-area-inset-bottom) + 64px) !important;
+  }
+  #confirmTheme{
+    margin-bottom: calc(env(safe-area-inset-bottom) + 18px) !important;
+  }
+  #theme .themeTitle{
+    top: 44%;
+  }
+}
