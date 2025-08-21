@@ -581,3 +581,37 @@ input::placeholder{color:rgba(31,42,52,.55)}
     top: 44%;
   }
 }
+
+
+/* ===== Mobile: move control buttons to bottom & open panels above ===== */
+@media (max-width: 600px){
+  .control-toggle{
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom) + 12px);
+  }
+  .control-toggle.gear{
+    right: calc(12px + var(--toggle) + 10px);
+  }
+  .control-toggle.info{
+    right: calc(12px + (var(--toggle) + 10px) * 2);
+  }
+
+  /* Panels open above the buttons */
+  #ctrlPanel.panel, #infoPanel.panel{
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom) + var(--toggle) + 20px);
+    right: 12px;
+    left: auto;
+  }
+
+  /* Theme selector spacing above bottom controls */
+  #theme .pager{
+    bottom: calc(env(safe-area-inset-bottom) + (var(--toggle) * 1.6)) !important;
+  }
+  #theme .hint{
+    bottom: calc(env(safe-area-inset-bottom) + (var(--toggle) * 2.2)) !important;
+  }
+  #confirmTheme{
+    margin-bottom: calc(env(safe-area-inset-bottom) + (var(--toggle) * 1.6)) !important;
+  }
+}
