@@ -1,0 +1,523 @@
+:root{
+  --ink:#122033; --muted:rgba(18,32,51,.72);
+  --accent:#5aa9d6; --accent-2:#79c2ea;
+  --glass-bg: rgba(255,255,255,.10); --glass-brd: rgba(255,255,255,.22);
+  --panel-bg: rgba(18,32,51,.55); --panel-brd: rgba(255,255,255,.28);
+  --glass-bg-mobile: rgba(255,255,255,.04);
+  --shadow-strong: 0 18px 50px rgba(24,40,72,.20);
+  --trans: all .35s cubic-bezier(.2,.9,.2,1);
+  --space: clamp(12px, 2.4vw, 22px);
+  --pad: clamp(12px, 2.4vw, 20px);
+  --logo: clamp(32px, 7vw, 44px);
+  --brand: clamp(22px, 5vw, 30px);
+  --instruction: clamp(14px, 4.2vw, 18px);
+  --btn-h: clamp(38px, 9vw, 48px);
+  --toggle: clamp(42px, 9.5vw, 46px);
+  --pager-bottom: clamp(20px, 6vh, 56px);
+  --jar-w: clamp(140px, 40vw, 220px);
+  --jar-h: clamp(170px, 48vw, 260px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+html, body, button, input, select { -webkit-tap-highlight-color: transparent; }
+button, .btn, input, select { outline: none !important; box-shadow: none !important; -webkit-appearance:none; appearance:none; }
+button::-moz-focus-inner{border:0}
+*:focus, *:focus-visible{outline:none !important; box-shadow:none !important}
+img,canvas { user-select:none; -webkit-user-select:none; -webkit-touch-callout:none }
+
+body{
+  font-family:"Quicksand",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  background:#eaf0f6;color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased;
+  padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
+}
+#bgCanvas{position:fixed;inset:0;z-index:-2;background:#eaf0f6;transition:opacity .5s ease}
+
+/* container */
+.container{
+  width:min(100% - 22px, 620px);
+  height:calc(90dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin:max(1.5dvh, 8px) auto;
+  border-radius:22px;overflow:hidden;background:var(--glass-bg);
+  border:1px solid var(--glass-brd);box-shadow:var(--shadow-strong);
+  display:flex;flex-direction:column;backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%)
+}
+body.themeScreen .container{ height:min(72dvh, 680px); }
+
+.screen{display:none;height:100%;position:relative}.screen.active{display:block}
+.inner{height:100%;padding:var(--pad);display:flex;flex-direction:column}
+.top{flex:0 0 auto; text-align:center;}.center{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
+.bottom{flex:0 0 auto}
+
+/* Testi */
+.logo{font-size:var(--logo);font-weight:800;letter-spacing:-.5px;color:#fff;text-shadow:0 4px 22px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25)}
+.brand{font-weight:800;color:#fff;text-shadow:0 3px 16px rgba(0,0,0,.35);font-size:var(--brand);letter-spacing:.2px}
+.tag{color:#fff;opacity:.96;text-shadow:0 3px 16px rgba(0,0,0,.35)}
+.whiteText{color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.35)} .small{font-size:12px}
+.captionText{position:absolute;left:12px;bottom:10px;color:#fff;font-weight:800;font-size:14px;letter-spacing:.2px;text-shadow:0 3px 12px rgba(0,0,0,.6)}
+
+/* Hint ora SOTTO il pager */
+.hint{
+  position:absolute;left:12px;right:12px;
+  bottom: calc(env(safe-area-inset-bottom) + 8px);
+  text-align:center;color:#fff;opacity:.9;font-weight:700;
+  text-shadow:0 3px 12px rgba(0,0,0,.6);pointer-events:none;font-size:12px
+}
+
+/* Header sopra il vaso */
+.headerBar{gap:6px;text-align:center;padding-top:6px;margin-bottom:6px}
+.userMeta{color:#fff;opacity:.95;font-size:13px;text-shadow:0 3px 12px rgba(0,0,0,.35);margin-top:2px}
+.instruction{font-size:var(--instruction);font-weight:800;color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.6);margin:10px 0 4px}
+
+/* Bottoni base */
+.btn{
+  width:100%;height:var(--btn-h);padding:0 14px;border:none;border-radius:14px;cursor:pointer;
+  background:linear-gradient(180deg,var(--accent),var(--accent-2));
+  color:#fff;font-weight:700;box-shadow:0 8px 22px rgba(90,169,214,.18);transition:var(--trans);display:inline-flex;align-items:center;justify-content:center
+}
+.btn:hover{transform:translateY(-1px)} .btn:active{transform:translateY(0)}
+.btn.secondary{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);box-shadow:none}
+
+/* Bottoni “testo trasparente” */
+.btn.ghost{
+  background:transparent !important; border:none !important; box-shadow:none !important; height:auto; padding:6px 2px; 
+  color:#fff; font-weight:800; text-decoration:underline; text-underline-offset:4px; letter-spacing:.3px
+}
+
+/* Inputs */
+input{width:100%;padding:14px 16px;border:none;border-radius:12px;background:rgba(255,255,255,.94);box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 2px 10px rgba(18,32,51,.05);font-size:15px;color:var(--ink)}
+input::placeholder{color:rgba(31,42,52,.55)}
+
+/* Carousel + Card */
+.swipe{position:relative;height:100%;overscroll-behavior:contain}
+.slides{position:absolute;inset:0;display:flex;touch-action:pan-y;will-change:transform;cursor:grab;user-select:none;gap:0;padding:0}
+.slides.dragging{cursor:grabbing}
+.slide{min-width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;position:relative;padding:var(--pad)}
+.themeCard{width:min(92%,520px);aspect-ratio:16/9;border-radius:18px;overflow:hidden;box-shadow:0 14px 36px rgba(20,40,70,.18);position:relative;isolation:isolate;background:#0b1220;margin:0 auto}
+.themeCard::after{content:"";position:absolute;inset:0;border-radius:18px;box-shadow:inset 0 0 0 0 rgba(255,255,255,0);transition:box-shadow .25s}
+.slide.selected .themeCard::after{box-shadow:inset 0 0 0 2px rgba(255,255,255,.92)}
+.themeThumbImg{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
+
+/* Pager (punto-tratto) */
+.pager{position:absolute;left:0;right:0;bottom:var(--pager-bottom);display:flex;justify-content:center;gap:10px}
+.pager button{height:10px;width:10px;border-radius:999px;background:#fff;border:0;opacity:.45;transition:width .18s,opacity .18s;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.pager button.active{opacity:.95;width:28px}
+
+/* Toggle tondi */
+.control-toggle{
+  position:fixed;top:calc(env(safe-area-inset-top) + 12px);right:12px;z-index:60;width:var(--toggle);height:var(--toggle);
+  border-radius:999px;display:inline-flex;align-items:center;justify-content:center;
+  background:var(--glass-bg); color:#fff; border:1px solid var(--glass-brd);
+  box-shadow:0 10px 28px rgba(25,45,70,.18); cursor:pointer; transition:transform .2s, background .25s, border-color .25s
+}
+.control-toggle:hover{transform:translateY(-1px)}
+.control-toggle svg{width:22px;height:22px;display:block}
+.control-toggle .icon-off{display:none}
+.control-toggle.muted .icon-on{display:none}
+.control-toggle.muted .icon-off{display:block}
+.control-toggle.gear{ right: calc(12px + var(--toggle) + 10px); }
+
+/* Pannello */
+.panel{
+  position:fixed;top:calc(env(safe-area-inset-top) + 56px);right:12px;left:auto;z-index:61;min-width:300px;
+  background:var(--panel-bg);border:1px solid var(--panel-brd);border-radius:14px;
+  box-shadow:0 18px 44px rgba(20,40,70,.3);padding:10px 10px 10px;color:#fff;display:none;
+  backdrop-filter:blur(12px) saturate(140%);-webkit-backdrop-filter:blur(12px) saturate(140%)
+}
+.panel.show{display:block}
+.panel h4{margin:6px 8px 6px;font-size:13px;color:#fff;opacity:.95}
+.row{display:flex;align-items:center;gap:10px;margin:8px 6px}
+.row label{flex:0 0 144px;font-size:12px;color:#fff;opacity:.9}
+.row select,.row input[type="range"],.row input[type="checkbox"]{flex:1}
+.switch{display:flex;align-items:center;gap:8px}
+.small-note{font-size:11px;color:#fff;opacity:.8;padding:0 8px 6px}
+
+/* Range compatti */
+.panel input[type="range"]{-webkit-appearance:none;appearance:none;background:transparent;height:22px}
+.panel input[type="range"]::-webkit-slider-runnable-track{height:4px;background:rgba(255,255,255,.35);border-radius:999px}
+.panel input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;border:1px solid rgba(18,32,51,.12);margin-top:-6px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.panel input[type="range"]::-moz-range-track{height:4px;background:rgba(255,255,255,.35);border-radius:999px}
+.panel input[type="range"]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:1px solid rgba(18,32,51,.12);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+
+/* Auth + Jar */
+.auth h1{font-size:clamp(20px,5.6vw,26px);margin-bottom:8px}
+.message{font-size:14px;color:#fff;opacity:.92;min-height:18px;margin-bottom:4px;text-shadow:0 2px 10px rgba(0,0,0,.45)}
+.jarWrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.phraseBubble{min-height:36px;max-width:420px;padding:8px 0;border-radius:0;color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.7);background:transparent;box-shadow:none}
+
+/* Jar responsive */
+.jar{
+  width:var(--jar-w);height:var(--jar-h);
+  border:2px solid rgba(255,255,255,.85);border-radius:22px;position:relative;cursor:pointer;
+  background:linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,.12));
+  box-shadow:inset 0 6px 24px rgba(255,255,255,.18), 0 10px 26px rgba(25,45,70,.10);animation:bob 4.5s ease-in-out infinite
+}
+.jar:hover{box-shadow:inset 0 10px 30px rgba(255,255,255,.28),0 14px 30px rgba(25,45,70,.14)}
+.jar:before{content:"";position:absolute;left:12%;right:12%;top:calc(-1 * min(14px, 2.8vh));height:16px;border:2px solid rgba(255,255,255,.85);border-bottom:none;border-radius:10px 10px 0 0;background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.5))}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes tap{0%{transform:scale(1)}35%{transform:scale(.985) translateY(1px)}100%{transform:scale(1)}}
+.star{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;opacity:.95;box-shadow:0 0 12px #fff;animation:twinkle 2.2s ease-in-out infinite}
+@keyframes twinkle{0%,100%{transform:scale(.85);opacity:.6}50%{transform:scale(1.35);opacity:1}}
+.sparkle{position:absolute;width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 0 12px #fff;animation:spark 900ms ease-out forwards}
+@keyframes spark{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+.inlineAdd{display:flex;flex-direction:column;gap:8px;width:100%;max-width:420px}.inlineAdd input{flex:1}
+.visually-hidden{position:absolute!important;clip:rect(0 0 0 0)!important;clip-path:inset(50%)!important;width:1px;height:1px;margin:-1px;overflow:hidden;padding:0;border:0}
+.pad{padding:16px 20px 20px}
+
+/* Mobile tuning */
+
+
+@media (min-width: 700px){
+  :root{ }
+  .panel{ right: calc((100vw - var(--container-max)) / 2 + 12px); }
+}
+@media (min-width: 1024px){
+  :root{ }
+  .panel{ right: calc((100vw - var(--container-max)) / 2 + 12px); }
+}
+@media (min-width: 1280px){
+  :root{ }
+  .panel{ right: calc((100vw - var(--container-max)) / 2 + 12px); }
+}
+@media (max-width: 480px){
+  .container{
+    width:min(100% - 22px, var(--container-max));
+    margin: 6px auto;
+    background: var(--glass-bg-mobile, rgba(255,255,255,.04));
+    border: 1px solid var(--glass-brd);
+    backdrop-filter: blur(8px) saturate(140%);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
+  }
+  body.themeScreen .container{ height: 68dvh; }
+  .swipe{ height: 56dvh; }
+  .screen .inner{ padding: 10px; }
+  .row label{ flex: 0 0 110px; font-size: 12px }
+  .panel{ left:12px; right:12px; min-width: initial }
+  .pager{bottom: clamp(14px, 7dvh, 28px)}
+  /* HINT resta sotto al pager */
+  .hint{ bottom: calc(env(safe-area-inset-bottom) + 6px); }
+  .captionText{font-size:13px;left:10px;bottom:8px}
+}
+
+
+/* === NO-CARD OVERLAY MODE === */
+
+/* Container fills viewport, no glass card */
+.container{
+  width:100%;
+  height:100dvh;
+  margin:0;
+  border-radius:0;
+  background: transparent;
+  border: 0;
+  box-shadow:none;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+
+/* Theme cards become flat thumbs without panel look */
+.themeCard{
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.themeCard::before, .themeCard::after{ display:none !important; }
+.themeCard img{ display:block; width:100%; height:100%; object-fit:cover; border-radius:18px; }
+
+/* Any generic .card gets neutralized */
+.card{
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Control panel: minimal overlay without card feel */
+.panel{
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 8px !important;
+}
+.panel h4{ margin: 4px 0 8px; font-weight:700; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+.panel .row{ display:flex; align-items:center; gap:10px; background: rgba(0,0,0,.15); border:1px solid rgba(255,255,255,.14);
+  padding:8px 10px; border-radius:12px; }
+.panel .switch{ background: transparent; border:0; padding:0; }
+
+/* Topbar and dock already overlays; keep them light */
+.topbar{ background: linear-gradient(to bottom, rgba(0,0,0,.28), rgba(0,0,0,0)); border-radius:0 0 16px 16px; }
+.dock{
+  left: 0; right: 0; width: min(900px, 96vw), 96vw);
+  margin: 0 auto var(--space);
+  background: transparent; border: 0; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+}
+.dock .input{ background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); }
+.dock .input:focus{ background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.42); }
+
+/* Inputs/buttons harmonized with theme */
+.input{ border-radius: 12px; }
+.btn{ border-radius: 12px; }
+.btn.round{ border-radius: 999px; }
+
+/* Ensure the canvas/background is visible behind everything */
+#bgCanvas{ position:fixed; inset:0; z-index:-2; }
+
+
+
+/* Theme title overlay (no preview card) */
+.themeTitle{
+  position:absolute;
+  left:50%;
+  top: 35%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(28px, 6vw, 56px);
+  font-weight: 800;
+  letter-spacing: .3px;
+  color: #fff;
+  text-shadow: 0 4px 22px rgba(0,0,0,.55), 0 1px 0 rgba(0,0,0,.35);
+  padding: .2rem .6rem;
+  border-radius: 14px;
+  pointer-events: none;
+}
+
+
+
+/* === Auth form sizing & inputs (login/register) === */
+#login .center, #register .center{
+  width: min(420px, 92vw);
+  margin: 0 auto;
+  align-items: stretch;
+}
+#login input, #register input{
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.28);
+  color: #fff;
+  box-shadow: none;
+}
+#login input::placeholder, #register input::placeholder{
+  color: rgba(255,255,255,.78);
+}
+#login .btn, #register .btn{ width: 100%; }
+
+/* === Info button placement (next to mic & gear) === */
+.control-toggle{ right: 12px; } /* default rightmost */
+.control-toggle.gear{ right: calc(12px + var(--toggle) + 10px); } /* to the left of mic */
+.control-toggle.info{ right: calc(12px + (var(--toggle) + 10px) * 2); } /* to the left of gear */
+
+/* === Info popup/panel sizing === */
+#infoPanel.panel{
+  right: 12px;
+  left: auto;
+  top: calc(env(safe-area-inset-top) + 56px);
+  min-width: 280px;
+  max-width: min(520px, 92vw);
+  padding: 12px 14px;
+  line-height: 1.4;
+}
+#ctrlPanel.panel{
+  right: calc(12px + var(--toggle) + 10px); /* align under the gear button */
+  left: auto;
+  top: calc(env(safe-area-inset-top) + 56px);
+}
+
+#infoPanel.panel h4{ margin: 0 0 10px; font-size: 1.05rem; }
+#infoPanel.panel p{ margin: 6px 0; font-size: .98rem; }
+
+
+
+/* Dock input same style as auth forms */
+#jar .dock .input{
+  background: transparent !important;
+  border: 1px solid rgba(255,255,255,.28) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  padding: 14px 16px !important;
+  height: var(--btn-h);
+}
+#jar .dock .input::placeholder{ color: rgba(255,255,255,.78) !important; }
+
+
+
+/* Force transparent input in the Jar dock (like login/register) */
+.screen-jar .dock .input,
+.dock .input{
+  background: transparent !important;
+  border: 1px solid rgba(255,255,255,.28) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  padding: 14px 16px !important;
+  height: var(--btn-h);
+}
+.screen-jar .dock .input::placeholder,
+.dock .input::placeholder{ color: rgba(255,255,255,.78) !important; }
+
+
+
+/* Force inline "Scrivi un pensiero" to match auth inputs */
+#inlineInput{
+  background: transparent !important;
+  border: 1px solid rgba(255,255,255,.28) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  padding: 14px 16px !important;
+  height: var(--btn-h);
+  border-radius: 12px;
+}
+#inlineInput::placeholder{ color: rgba(255,255,255,.78) !important; }
+
+
+
+/* ==== Realistic backgrounds: full-screen video layer ==== */
+.bg-video{
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  z-index: -2; opacity: 0; transition: opacity .6s ease;
+  pointer-events: none; background: #000;
+}
+.bg-video.is-visible{ opacity: 1; }
+
+/* Canvas fallback stays beneath video (hidden when video is active) */
+#bgCanvas{ position: fixed; inset: 0; z-index: -3; background: #0a0e1e; transition: opacity .6s ease; }
+
+
+
+
+
+.inlineAdd .btn{width:100%;}
+
+/* Login title spacing */
+.login-title{
+  margin: 0 0 10px 0;
+  line-height: 1.1;
+}
+
+
+/* ===== Jar inner white glow + gold dots (override) ===== */
+.jar{ overflow: hidden; }
+
+.jar::after{
+  content:"";
+  position:absolute;
+  /* keep a bit of padding so the glow doesn't clip under the border */
+  left:6%; right:6%; top:8%; bottom:10%;
+  background: radial-gradient(ellipse at 50% 70%,
+    rgba(255,255,255,.55) 0%,
+    rgba(255,255,255,.30) 34%,
+    rgba(255,255,255,.12) 58%,
+    rgba(255,255,255,0) 80%);
+  filter: blur(2px);
+  pointer-events:none;
+}
+
+/* Golden glowing dots for thoughts */
+.star, .sparkle{ pointer-events:none; }
+.star{
+  background:#ffd76e !important;
+  box-shadow: 0 0 6px rgba(255,206,102,.95), 0 0 12px rgba(255,178,72,.75) !important;
+}
+.sparkle{
+  background:#ffd76e !important;
+  box-shadow: 0 0 10px rgba(255,206,102,.95), 0 0 20px rgba(255,178,72,.75) !important;
+}
+
+
+/* ===== Refined Jar shape + unmistakable soft glow ===== */
+#jar .jar, #jarTap.jar{
+  position: relative;
+  overflow: hidden;
+  /* bulged jar shape */
+  border-radius: 28px 28px 46px 46px / 18px 18px 38px 38px;
+  /* subtle glass fill to separate from video/bg */
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.035));
+  -webkit-backdrop-filter: blur(2.2px) saturate(1.06);
+  backdrop-filter: blur(2.2px) saturate(1.06);
+  /* crisp inner and soft inner-bottom shading */
+  box-shadow:
+    inset 0 0 0 1.2px rgba(255,255,255,.38),
+    inset 0 -10px 24px rgba(10,10,20,.22);
+}
+
+/* outer separation from bg (balanced for both dark and light scenes) */
+#jar .jar::before, #jarTap.jar::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius: inherit;
+  pointer-events:none;
+  /* twin drop-shadows to pop from bg without looking heavy */
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.25),
+    0 10px 26px rgba(0,0,0,.28);
+  z-index: 2;
+}
+
+/* inner white glow, soft and contained */
+#jar .jar::after, #jarTap.jar::after{
+  content:"";
+  position:absolute;
+  left:6%; right:6%; top:8%; bottom:10%;
+  border-radius: 32% 32% 40% 40% / 28% 28% 46% 46%;
+  background:
+    radial-gradient(ellipse at 50% 68%,
+      rgba(255,255,255,.50) 0%,
+      rgba(255,255,255,.32) 26%,
+      rgba(255,255,255,.18) 48%,
+      rgba(255,255,255,.08) 64%,
+      rgba(255,255,255,0) 80%);
+  filter: blur(1.5px);
+  pointer-events:none;
+  z-index: 0;
+}
+
+/* Ensure golden dots sit above glow but below rim/outline */
+.star, .sparkle{ z-index: 1; position: absolute; }
+
+
+/* ===== Pulsing inner glow + subtle vertical sheen ===== */
+
+/* Inner glow pulse (uses CSS variables for smooth alpha/position animation) */
+#jar .jar::after, #jarTap.jar::after{
+  --a0:.50; --a1:.32; --a2:.18; --a3:.08; --glowY:68%;
+  background:
+    radial-gradient(ellipse at 50% var(--glowY),
+      rgba(255,255,255,var(--a0)) 0%,
+      rgba(255,255,255,var(--a1)) 26%,
+      rgba(255,255,255,var(--a2)) 48%,
+      rgba(255,255,255,var(--a3)) 64%,
+      rgba(255,255,255,0) 80%);
+  animation: jarGlowPulse 4.2s ease-in-out infinite;
+}
+
+@keyframes jarGlowPulse{
+  0%   { --a0:.46; --a1:.30; --a2:.16; --a3:.06; --glowY:68%; filter: blur(1.4px); }
+  50%  { --a0:.62; --a1:.36; --a2:.22; --a3:.10; --glowY:66%; filter: blur(1.9px); }
+  100% { --a0:.46; --a1:.30; --a2:.16; --a3:.06; --glowY:68%; filter: blur(1.4px); }
+}
+
+/* Subtle vertical sheen moving slowly down and up */
+#jar .jar::before, #jarTap.jar::before{
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,.14) 12%,
+      rgba(255,255,255,0) 24%
+    );
+  background-size: 100% 240%;
+  background-position: 0% -140%;
+  animation: jarSheen 6.5s ease-in-out infinite;
+}
+
+@keyframes jarSheen{
+  0%   { background-position: 0% -140%; }
+  50%  { background-position: 0%  20%; }
+  100% { background-position: 0% -140%; }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce){
+  #jar .jar::after, #jarTap.jar::after,
+  #jar .jar::before, #jarTap.jar::before{
+    animation: none !important;
+  }
+}
